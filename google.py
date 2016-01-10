@@ -152,4 +152,6 @@ class GoogleAgendaApi:
             influx.send_data(json_body)
 
     def create_google_event_list(self):
-        return list(GoogleEvent(el) for el in self.get_events())
+        events = list(GoogleEvent(el) for el in self.get_events())
+        self.send_events_to_influxdb(events)
+        return events
