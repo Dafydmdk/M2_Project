@@ -1,110 +1,7 @@
-import os
-import logging
-import sys
-
-
-class Ain:
-    def __init__(self, number, test=False):
-        self.number = number
-        if test:
-            self.sys_path = './'
-            self.ocp = 'ocp.3'
-            self.helper = 'helper.13'
-        else:
-            self.sys_path = '/sys/devices/'
-            os.popen('echo cape-bone-iio > ' +
-                     self.sys_path + 'bone_capemgr.*/slots')
-            self.ocp = self.find_pattern(self.sys_path, 'ocp')
-            self.helper = self.find_pattern(self.sys_path + self.ocp,
-                                            'helper')
-
-    def find_pattern(self, where, pattern):
-        dirs = os.listdir(where)
-        if dirs:
-            matchs = list((ele for ele in dirs if not ele.find(pattern)))
-            if matchs:
-                return matchs[0]
-            else:
-                logging.critical('Unable to find pattern ' + pattern)
-                sys.exit(1)
-        else:
-            logging.critical('Unable to find folder ' + where)
-            sys.exit(1)
-
-    def value(self):
-        try:
-            with open(self.sys_path +
-                      self.ocp +
-                      '/' +
-                      self.helper +
-                      '/AIN' +
-                      self.number) as f:
-                return f.read()
-        except IOError:
-            logging.critical('Unable to open the AIN path')
-            sys.exit(1)
-
-
-class Gpio:
-    def __init__(self, gpio, test=False):
-        self.gpio = gpio
-        self.test = test
-        if self.test:
-            self.sys_path = './'
-        else:
-            self.sys_path = '/sys/class/'
-        self.path = self.sys_path + 'gpio/' + self.gpio + '/'
-        try:
-            with open(self.sys_path + 'gpio/export', 'w') as f:
-                f.write(self.gpio[4:])
-        except IOError:
-            logging.critical('Unable to open the gpio path')
-            sys.exit(1)
-
-    def __del__(self):
-        if not self.test:
-            try:
-                with open(self.sys_path + 'gpio/unexport', 'w') as f:
-                    f.write(self.gpio[4:])
-            except IOError:
-                logging.critical('Unable to open the gpio path')
-                sys.exit(1)
-
-    def value(self):
-        try:
-            with open(self.path + 'direction', 'w') as f:
-                f.write('0')
-            with open(self.path + 'value') as f:
-                return f.read()
-        except IOError:
-            logging.critical('Unable to open the gpio path')
-            sys.exit(1)
-
-    def set_value(self, value):
-        try:
-            with open(self.path + 'direction', 'w') as f:
-                f.write('1')
-            with open(self.path + 'value', 'w') as f:
-                f.write(value)
-        except IOError:
-            logging.critical('Unable to open the gpio path')
-            sys.exit(1)
-
-
-class Led(Gpio):
-    def __init__(self, gpio, test=False):
-        super().__init__(gpio, test)
-
-    def on(self):
-        self.set_value('1')
-
-    def off(self):
-        self.set_value('0')
-
-
-class GoogleAgendaApi:
-    def __init__(self):
-        pass
+from IO import *
+from Google import *
+import datetime
+import time
 
 
 class Simulation:
@@ -115,9 +12,10 @@ class Simulation:
         self.pot = Ain('5', test)
         self.__heat = False
         self.__clim = False
+        self.gaapi = GoogleAgendaApi('./client_id.json')
 
     def temp_int(self):
-        return (float(self.pot.value()) * 15.0 / 1800.0) + 10.0
+        return (float(self.pot.value) * 15.0 / 1800.0) + 10.0
 
     @property
     def heat(self):
@@ -152,3 +50,30 @@ class Simulation:
             self.led_g.on()
         else:
             self.led_g.off()
+
+    def run(self):
+        event_list = self.gaapi.create_google_event_list()
+        now = datetime.datetime.now()
+        hour = now.strftime('%H')
+        min = now.strftime('%M')
+        float_curent_hour = float(hour) + float(min)/60.0
+        for event in event_list:
+            if event.begin.to_float_hour() <= float_curent_hour:
+                if event.end.to_float_hour() >= float_curent_hour:
+                    if float(event.temp) - self.temp_int() >= 0.5:
+                        self.heat = True
+                    elif float(event.temp) - self.temp_int() <= -0.5:
+                        self.clim = True
+                    else:
+                        self.clim = False
+                        self.heat = False
+
+    def main_loop(self):
+        while True:
+            self.run()
+            time.sleep(60)
+
+
+if __name__ == '__main__':
+    sim = Simulation()
+    sim.main_loop()

@@ -33,7 +33,7 @@ class TestAin(unittest.TestCase):
             os.makedirs('./ocp.3/helper.13')
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
             f.write('42')
-        value = ain.value()
+        value = ain.value
         self.assertEqual(value, '42')
         print(' - OK')
         shutil.rmtree('./ocp.3/helper.13', ignore_errors=True)
@@ -59,7 +59,7 @@ class TestGpio(unittest.TestCase):
         with open('./gpio/gpio60/value', 'w') as f:
             f.write('42')
         gpio = simulation.Gpio('gpio60', True)
-        value = gpio.value()
+        value = gpio.value
         self.assertEqual(value, '42')
         with open('./gpio/gpio60/direction') as f:
             value = f.read()
@@ -72,7 +72,7 @@ class TestGpio(unittest.TestCase):
         if not os.path.exists('./gpio/gpio60'):
             os.makedirs('./gpio/gpio60')
         gpio = simulation.Gpio('gpio60', True)
-        gpio.set_value('42')
+        gpio.value = '42'
         with open('./gpio/gpio60/value') as f:
             value = f.read()
             self.assertEqual(value, '42')
@@ -123,16 +123,51 @@ class TestSimulation(unittest.TestCase):
         sim = simulation.Simulation(True)
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
             f.write('0')
-        value = sim.temperature()
+        value = sim.temp_int()
         self.assertEqual(value, 10.0)
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
             f.write('1800')
-        value = sim.temperature()
+        value = sim.temp_int()
         self.assertEqual(value, 25.0)
         print(' - OK')
         shutil.rmtree('./ocp.3/helper.13', ignore_errors=True)
         shutil.rmtree('./gpio', ignore_errors=True)
         os.rmdir('./ocp.3')
+
+
+class TestGoogleEvent(unittest.TestCase):
+    def test_class(self):
+        print('Test - Google Event class creation', end='')
+        ev = {'organizer': {'displayName': 'Thermostat', 'email':\
+              'qi81udh8n9num6oquladg0go0g@group.calendar.google.com', 'self\
+              ': True}, 'start': {'dateTime': '2016-01-09T10:30:00Z'}, 'cre\
+              ated': '2016-01-09T22:15:50.000Z', 'sequence': 0, 'end': {'da\
+              teTime': '2016-01-09T11:30:00Z'}, 'summary': '18', 'reminders\
+              ': {'useDefault': True}, 'creator': {'displayName': 'Kévin Dl\
+              le', 'email': 'kevin.dubrulle@gmail.com'}, 'id': '8mo045m0nrq\
+              ev091i26u8vkq04', 'updated': '2016-01-09T22:15:50.663Z', 'eta\
+              g': '""2904755501326000""', 'iCalUID': '8mo045m0nrqev091i26u8vk\
+              q04@google.com', 'htmlLink': 'https://calendar.google.com/cal\
+              endar/event?eid=OG1vMDQ1bTBucnFldjA5MWkyNnU4dmtxMDQgcWk4MXVka\
+              DhuOW51bTZvcXVsYWRnMGdvMGdAZw', 'status': 'confirmed', 'kind'
+              : 'calendar#event'}
+        event = simulation.GoogleEvent(ev)
+        self.assertIsNotNone(event)
+        print(' - OK')
+
+
+class TestGoogleAgandaApi(unittest.TestCase):
+    def test_get_cred(self):
+        print('Test - Google Agenda credentials', end='')
+        gaapi = simulation.GoogleAgendaApi('./client_id.json')
+        self.assertIsNotNone(gaapi)
+        print(' - OK')
+
+    def test_get_events(self):
+        print('Test - Google Agenda events - PLEASE CREATE ONE BEFORE', end='')
+        gaapi = simulation.GoogleAgendaApi('./client_id.json')
+        self.assertIsNotNone(gaapi.get_events())
+        print(' - OK')
 
 
 if __name__ == '__main__':
