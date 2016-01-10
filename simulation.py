@@ -1,3 +1,7 @@
+"""
+Simulation module, must be called as main.
+"""
+
 from IO import *
 from Google import *
 import datetime
@@ -6,7 +10,22 @@ from influxdb import InfluxDBClient
 
 
 class Simulation:
+
+    """
+    Handle heating or air conditioning state change, regarding the
+    inside temperature (potentiometer) and the command (Google Calendar)
+    Change leds' state according to the heating or the air conditioning
+    state.
+    """
+
     def __init__(self, test=False):
+
+        """
+        Simulation class' constructor.
+        :param test: If true, change the gpios' path to allow a test on
+        something else than a BeagleBone
+        """
+
         self.led_r = Led('gpio07', test)  # maybe wrong
         self.led_g = Led('gpio50', test)
         self.led_b = Led('gpio51', test)
@@ -17,27 +36,69 @@ class Simulation:
 
     @property
     def temp_int(self):
+
+        """
+        Property to get the float version of the inside temperature, from the
+        potentiometer. It is an affine function :
+        potentiometer: 0 mV to 1800 mV
+        return: 10.0°C to 25.0°C
+        :return: The float version of the inside temperature.
+        """
+
         return (float(self.pot.value) * 15.0 / 1800.0) + 10.0
 
     @property
     def heat(self):
+
+        """
+        Getter property for the __heat variable.
+        :return: __heat variable.
+        """
+
         return self.__heat
 
     @heat.setter
     def heat(self, boolean):
+
+        """
+        Setter property for the __heat variable
+        :param boolean: New __heat state: True or False
+        """
+
         self.__heat = boolean
         self.on_state_changed()
 
     @property
     def clim(self):
+
+        """
+        Getter property for the __clim variable.
+        :return: __clim variable.
+        """
+
         return self.__clim
 
     @clim.setter
     def clim(self, boolean):
+
+        """
+        Setter property for the __clim variable
+        :param boolean: New __clim state: True or False
+        """
+
         self.__clim = boolean
         self.on_state_changed()
 
     def on_state_changed(self):
+
+        """
+        Change the IOs' state according to the air conditioning or the heating
+        state.
+        Heat? Red led.
+        Air conditioning? Blue led.
+        No? Green led.
+        """
+
         if self.heat:
             self.led_r.on()
         else:
@@ -54,11 +115,29 @@ class Simulation:
             self.led_g.off()
 
     def run(self):
+
+        """
+        Start one simulation's cycle:
+            Get the Google Calendar events' list.
+            Get the current time.
+            For each Google event, if the current hour is in the hour range of
+            the event:
+                If the difference between the command temperature and the
+                inside temperature is more or equal than 0.5°C:
+                    Put the heating on.
+                Else if the difference between the command temperature and the
+                inside temperature is less or equal than -0.5°C:
+                    Put the air conditioning on.
+                Else:
+                    Put both off.
+            Send the data to InfluxDB.
+        """
+
         event_list = self.gaapi.create_google_event_list()
         now = datetime.datetime.now()
         hour = now.strftime('%H')
         min = now.strftime('%M')
-        float_curent_hour = float(hour) + float(min)/60.0
+        float_curent_hour = float(hour) + float(min) / 60.0
         for event in event_list:
             if event.begin.to_float_hour() <= float_curent_hour:
                 if event.end.to_float_hour() >= float_curent_hour:
@@ -72,11 +151,18 @@ class Simulation:
         self.send_to_influxdb()
 
     def send_to_influxdb(self):
-        client = InfluxDBClient('5.196.8.140',
-                                8086,
-                                'ISEN',
-                                'ISEN29',
-                                'thermostat')
+
+        """
+        Send the inside temperature, the air conditioning state and the heating
+        state to InfluxDB.
+        """
+
+        db_client = InfluxDBClient('5.196.8.140',
+                                   8086,
+                                   'ISEN',
+                                   'ISEN29',
+                                   'thermostat')
+
         json_body = [
             {
                 "measurement": "temp_interieure",
@@ -88,7 +174,8 @@ class Simulation:
                 }
             }
         ]
-        client.write_points(json_body)
+        db_client.write_points(json_body)
+
         json_body = [
             {
                 "measurement": "climatisation",
@@ -100,7 +187,8 @@ class Simulation:
                 }
             }
         ]
-        client.write_points(json_body)
+        db_client.write_points(json_body)
+
         json_body = [
             {
                 "measurement": "chauffage",
@@ -112,9 +200,14 @@ class Simulation:
                 }
             }
         ]
-        client.write_points(json_body)
+        db_client.write_points(json_body)
 
     def main_loop(self):
+
+        """
+        Infinite simulation's loop, with a 60 seconds' sleep.
+        """
+
         # If you want to cron this script instead of this infinite loop,
         # just delete it, and call just self.run() in this function
         while True:
