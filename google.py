@@ -131,8 +131,8 @@ class GoogleAgendaApi:
         return events['items']
 
     def send_events_to_influxdb(self, events):
+        binome = "Dubrulle_Paillot"
         for event in events:
-            binome = "Dubrulle_Paillot"
             now = datetime.date.today()
             json_body = [
                 {
