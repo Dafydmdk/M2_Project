@@ -6,6 +6,7 @@ import os
 import httplib2
 import oauth2client
 import apiclient.discovery
+import influx
 
 
 class MyTime:
@@ -127,12 +128,28 @@ class GoogleAgendaApi:
             timeMax=now.strftime('%Y-%m-%dT23:59:59+01:00'),
         ).execute()
 
-        event_list = []
+        return events['items']
 
-        for event in events['items']:
-            event_list.append(event)
-
-        return event_list
+    def send_events_to_influxdb(self, events):
+        for event in events:
+            binome = "Dubrulle_Paillot"
+            now = datetime.date.today()
+            json_body = [
+                {
+                    "measurement": "consigne",
+                    "tags": {
+                        "binome": binome
+                    },
+                    "time": now.strftime('%Y-%m-%dT{h}:{m}.000000000Z'.format(
+                        h=event.begin.hour,
+                        m=event.begin.min
+                    )),
+                    "fields": {
+                        "value": event.temp
+                    }
+                }
+            ]
+            influx.send_data(json_body)
 
     def create_google_event_list(self):
         return list(GoogleEvent(el) for el in self.get_events())

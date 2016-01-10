@@ -4,7 +4,7 @@ Simulation module, must be called as main.
 
 import datetime
 import time
-import influxdb
+import influx
 import bone
 import google
 
@@ -159,50 +159,46 @@ class Simulation:
         pollute the ISEN's InfluxDB, and it would be a shame...
         """
 
-        db_client = influxdb.InfluxDBClient('5.196.8.140',
-                                            8086,
-                                            'ISEN',
-                                            'ISEN29',
-                                            'thermostat')
+        binome = "Dubrulle_Paillot"
 
         json_body = [
             {
                 "measurement": "temp_interieure",
                 "tags": {
-                    "binome": "Dubrulle_Paillot"
+                    "binome": binome
                 },
                 "fields": {
                     "value": self.temp_int
                 }
             }
         ]
-        db_client.write_points(json_body)
+        influx.send_data(json_body)
 
         json_body = [
             {
                 "measurement": "climatisation",
                 "tags": {
-                    "binome": "Dubrulle_Paillot"
+                    "binome": binome
                 },
                 "fields": {
                     "value": 1 if self.clim else 0
                 }
             }
         ]
-        db_client.write_points(json_body)
+        influx.send_data(json_body)
 
         json_body = [
             {
                 "measurement": "chauffage",
                 "tags": {
-                    "binome": "Dubrulle_Paillot"
+                    "binome": binome
                 },
                 "fields": {
                     "value": 1 if self.heat else 0
                 }
             }
         ]
-        db_client.write_points(json_body)
+        influx.send_data(json_body)
 
     def main_loop(self):
 
