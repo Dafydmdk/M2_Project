@@ -3,12 +3,14 @@ import shutil
 import unittest
 
 import simulation
+import bone
+import google
 
 
 class TestAin(unittest.TestCase):
     def test_pattern_ocp(self):
         print('Test - ocp.x detection', end='')
-        ain = simulation.Ain('5', True)
+        ain = bone.Ain('5', True)
         if not os.path.exists('./ocp.3'):
             os.makedirs('./ocp.3')
         match_folder = ain.find_pattern('./', 'ocp')
@@ -18,7 +20,7 @@ class TestAin(unittest.TestCase):
 
     def test_pattern_helper(self):
         print('Test - helper.xy detection', end='')
-        ain = simulation.Ain('5', True)
+        ain = bone.Ain('5', True)
         if not os.path.exists('./helper.13'):
             os.makedirs('./helper.13')
         match_folder = ain.find_pattern('./', 'helper')
@@ -28,7 +30,7 @@ class TestAin(unittest.TestCase):
 
     def test_value(self):
         print('Test - value get', end='')
-        ain = simulation.Ain('5', True)
+        ain = bone.Ain('5', True)
         if not os.path.exists('./ocp.3/helper.13'):
             os.makedirs('./ocp.3/helper.13')
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
@@ -45,7 +47,7 @@ class TestGpio(unittest.TestCase):
         print('Test - Gpio class init and del', end='')
         if not os.path.exists('./gpio'):
             os.makedirs('./gpio')
-        gpio = simulation.Gpio('gpio60', True)
+        gpio = bone.Gpio('gpio60', True)
         with open('./gpio/export') as f:
             value = f.read()
             self.assertEqual(value, '60')
@@ -58,7 +60,7 @@ class TestGpio(unittest.TestCase):
             os.makedirs('./gpio/gpio60')
         with open('./gpio/gpio60/value', 'w') as f:
             f.write('42')
-        gpio = simulation.Gpio('gpio60', True)
+        gpio = bone.Gpio('gpio60', True)
         value = gpio.value
         self.assertEqual(value, '42')
         with open('./gpio/gpio60/direction') as f:
@@ -71,7 +73,7 @@ class TestGpio(unittest.TestCase):
         print('Test - Gpio class value write', end='')
         if not os.path.exists('./gpio/gpio60'):
             os.makedirs('./gpio/gpio60')
-        gpio = simulation.Gpio('gpio60', True)
+        gpio = bone.Gpio('gpio60', True)
         gpio.value = '42'
         with open('./gpio/gpio60/value') as f:
             value = f.read()
@@ -88,7 +90,7 @@ class TestLed(unittest.TestCase):
         print('Test - Led on', end='')
         if not os.path.exists('./gpio/gpio60'):
             os.makedirs('./gpio/gpio60')
-        led = simulation.Led('gpio60', True)
+        led = bone.Led('gpio60', True)
         led.on()
         with open('./gpio/gpio60/value') as f:
             value = f.read()
@@ -100,7 +102,7 @@ class TestLed(unittest.TestCase):
         print('Test - Led off', end='')
         if not os.path.exists('./gpio/gpio60'):
             os.makedirs('./gpio/gpio60')
-        led = simulation.Led('gpio60', True)
+        led = bone.Led('gpio60', True)
         led.off()
         with open('./gpio/gpio60/value') as f:
             value = f.read()
@@ -151,7 +153,7 @@ class TestGoogleEvent(unittest.TestCase):
               endar/event?eid=OG1vMDQ1bTBucnFldjA5MWkyNnU4dmtxMDQgcWk4MXVka\
               DhuOW51bTZvcXVsYWRnMGdvMGdAZw', 'status': 'confirmed', 'kind'
               : 'calendar#event'}
-        event = simulation.GoogleEvent(ev)
+        event = google.GoogleEvent(ev)
         self.assertIsNotNone(event)
         print(' - OK')
 
@@ -159,13 +161,13 @@ class TestGoogleEvent(unittest.TestCase):
 class TestGoogleAgandaApi(unittest.TestCase):
     def test_get_cred(self):
         print('Test - Google Agenda credentials', end='')
-        gaapi = simulation.GoogleAgendaApi('./client_id.json')
+        gaapi = google.GoogleAgendaApi('./client_id.json')
         self.assertIsNotNone(gaapi)
         print(' - OK')
 
     def test_get_events(self):
         print('Test - Google Agenda events - PLEASE CREATE ONE BEFORE', end='')
-        gaapi = simulation.GoogleAgendaApi('./client_id.json')
+        gaapi = google.GoogleAgendaApi('./client_id.json')
         self.assertIsNotNone(gaapi.get_events())
         print(' - OK')
 

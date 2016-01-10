@@ -2,11 +2,11 @@
 Simulation module, must be called as main.
 """
 
-from IO import *
-from Google import *
 import datetime
 import time
 from influxdb import InfluxDBClient
+import bone
+import google
 
 
 class Simulation:
@@ -26,13 +26,13 @@ class Simulation:
         something else than a BeagleBone
         """
 
-        self.led_r = Led('gpio07', test)  # maybe wrong
-        self.led_g = Led('gpio50', test)
-        self.led_b = Led('gpio51', test)
-        self.pot = Ain('5', test)
+        self.led_r = bone.Led('gpio07', test)  # maybe wrong
+        self.led_g = bone.Led('gpio50', test)
+        self.led_b = bone.Led('gpio51', test)
+        self.pot = bone.Ain('5', test)
         self.__heat = False
         self.__clim = False
-        self.gaapi = GoogleAgendaApi('./client_id.json')
+        self.gaapi = google.GoogleAgendaApi('./client_id.json')
 
     @property
     def temp_int(self):
@@ -136,11 +136,11 @@ class Simulation:
         event_list = self.gaapi.create_google_event_list()
         now = datetime.datetime.now()
         hour = now.strftime('%H')
-        min = now.strftime('%M')
-        float_curent_hour = float(hour) + float(min) / 60.0
+        minu = now.strftime('%M')
+        float_current_hour = float(hour) + float(minu) / 60.0
         for event in event_list:
-            if event.begin.to_float_hour() <= float_curent_hour:
-                if event.end.to_float_hour() >= float_curent_hour:
+            if event.begin.to_float_hour() <= float_current_hour:
+                if event.end.to_float_hour() >= float_current_hour:
                     if float(event.temp) - self.temp_int >= 0.5:
                         self.heat = True
                     elif float(event.temp) - self.temp_int <= -0.5:
@@ -155,6 +155,8 @@ class Simulation:
         """
         Send the inside temperature, the air conditioning state and the heating
         state to InfluxDB.
+        Obviously, no unittest for this method, because otherwise it would
+        pollute the ISEN's InfluxDB, and it would be a shame...
         """
 
         db_client = InfluxDBClient('5.196.8.140',
@@ -216,5 +218,4 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    sim = Simulation()
-    sim.main_loop()
+    Simulation().main_loop()

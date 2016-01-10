@@ -5,8 +5,7 @@ import datetime
 import os
 import httplib2
 import oauth2client
-from oauth2client import client
-from apiclient.discovery import build
+import apiclient.discovery
 
 
 class MyTime:
@@ -101,7 +100,7 @@ class GoogleAgendaApi:
         store = oauth2client.file.Storage(credential_path)
         cred = store.get()
         if not cred or cred.invalid:
-            flow = client.flow_from_clientsecrets(
+            flow = oauth2client.client.flow_from_clientsecrets(
                     cred_file,
                     'https://www.googleapis.com/auth/calendar')
             flow.user_agent = 'Thermostat'
@@ -114,7 +113,7 @@ class GoogleAgendaApi:
     def get_service(self):
         http = httplib2.Http()
         http = self.cred.authorize(http)
-        service = build("calendar", "v3", http=http)
+        service = apiclient.discovery.build("calendar", "v3", http=http)
         return service
 
     def get_events(self):
