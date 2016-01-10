@@ -115,6 +115,8 @@ class Simulation:
         client.write_points(json_body)
 
     def main_loop(self):
+        # If you want to cron this script instead of this infinite loop,
+        # just delete it, and call just self.run() in this function
         while True:
             self.run()
             time.sleep(60)
