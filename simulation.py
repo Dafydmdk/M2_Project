@@ -4,7 +4,7 @@ Simulation module, must be called as main.
 
 import datetime
 import time
-from influxdb import InfluxDBClient
+import influxdb
 import bone
 import google
 
@@ -159,11 +159,11 @@ class Simulation:
         pollute the ISEN's InfluxDB, and it would be a shame...
         """
 
-        db_client = InfluxDBClient('5.196.8.140',
-                                   8086,
-                                   'ISEN',
-                                   'ISEN29',
-                                   'thermostat')
+        db_client = influxdb.InfluxDBClient('5.196.8.140',
+                                            8086,
+                                            'ISEN',
+                                            'ISEN29',
+                                            'thermostat')
 
         json_body = [
             {
