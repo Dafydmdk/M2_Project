@@ -2,7 +2,7 @@ from IO import *
 from Google import *
 import datetime
 import time
-import requests
+from influxdb import InfluxDBClient
 
 
 class Simulation:
@@ -69,21 +69,49 @@ class Simulation:
                     else:
                         self.clim = False
                         self.heat = False
-        requests.post(
-                'http://5.196.8.140:8086/write?db=thermostat',
-                auth=('ISEN', 'ISEN29'),
-                data='temp_interieure,binome=Dubrulle_Paillot,value=' +
-                     str(self.temp_int))
-        requests.post(
-                'http://5.196.8.140:8086/write?db=thermostat',
-                auth=('ISEN', 'ISEN29'),
-                data='climatisation,binome=Dubrulle_Paillot,value=' +
-                     '1' if self.clim else '0')
-        requests.post(
-                'http://5.196.8.140:8086/write?db=thermostat',
-                auth=('ISEN', 'ISEN29'),
-                data='chauffage,binome=Dubrulle_Paillot,value=' +
-                     '1' if self.heat else '0')
+
+    def send_to_influxdb(self):
+        client = InfluxDBClient('5.196.8.140',
+                                8086,
+                                'ISEN',
+                                'ISEN29',
+                                'thermostat')
+        json_body = [
+            {
+                "measurement": "temp_interieure",
+                "tags": {
+                    "binome": "Dubrulle_Paillot"
+                },
+                "fields": {
+                    "value": self.temp_int
+                }
+            }
+        ]
+        client.write_points(json_body)
+        json_body = [
+            {
+                "measurement": "climatisation",
+                "tags": {
+                    "binome": "Dubrulle_Paillot"
+                },
+                "fields": {
+                    "value": 1 if self.clim else 0
+                }
+            }
+        ]
+        client.write_points(json_body)
+        json_body = [
+            {
+                "measurement": "chauffage",
+                "tags": {
+                    "binome": "Dubrulle_Paillot"
+                },
+                "fields": {
+                    "value": 1 if self.heat else 0
+                }
+            }
+        ]
+        client.write_points(json_body)
 
     def main_loop(self):
         while True:
