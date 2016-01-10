@@ -69,6 +69,7 @@ class Simulation:
                     else:
                         self.clim = False
                         self.heat = False
+        self.send_to_influxdb()
 
     def send_to_influxdb(self):
         client = InfluxDBClient('5.196.8.140',
