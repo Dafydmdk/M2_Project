@@ -123,11 +123,11 @@ class TestSimulation(unittest.TestCase):
         sim = simulation.Simulation(True)
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
             f.write('0')
-        value = sim.temp_int()
+        value = sim.temp_int
         self.assertEqual(value, 10.0)
         with open('./ocp.3/helper.13/AIN5', 'w') as f:
             f.write('1800')
-        value = sim.temp_int()
+        value = sim.temp_int
         self.assertEqual(value, 25.0)
         print(' - OK')
         shutil.rmtree('./ocp.3/helper.13', ignore_errors=True)

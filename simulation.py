@@ -2,6 +2,7 @@ from IO import *
 from Google import *
 import datetime
 import time
+import requests
 
 
 class Simulation:
@@ -14,6 +15,7 @@ class Simulation:
         self.__clim = False
         self.gaapi = GoogleAgendaApi('./client_id.json')
 
+    @property
     def temp_int(self):
         return (float(self.pot.value) * 15.0 / 1800.0) + 10.0
 
@@ -60,13 +62,28 @@ class Simulation:
         for event in event_list:
             if event.begin.to_float_hour() <= float_curent_hour:
                 if event.end.to_float_hour() >= float_curent_hour:
-                    if float(event.temp) - self.temp_int() >= 0.5:
+                    if float(event.temp) - self.temp_int >= 0.5:
                         self.heat = True
-                    elif float(event.temp) - self.temp_int() <= -0.5:
+                    elif float(event.temp) - self.temp_int <= -0.5:
                         self.clim = True
                     else:
                         self.clim = False
                         self.heat = False
+        requests.post(
+                'http://5.196.8.140:8086/write?db=thermostat',
+                auth=('ISEN', 'ISEN29'),
+                data='temp_interieure,binome=Dubrulle_Paillot,value=' +
+                     str(self.temp_int))
+        requests.post(
+                'http://5.196.8.140:8086/write?db=thermostat',
+                auth=('ISEN', 'ISEN29'),
+                data='climatisation,binome=Dubrulle_Paillot,value=' +
+                     '1' if self.clim else '0')
+        requests.post(
+                'http://5.196.8.140:8086/write?db=thermostat',
+                auth=('ISEN', 'ISEN29'),
+                data='chauffage,binome=Dubrulle_Paillot,value=' +
+                     '1' if self.heat else '0')
 
     def main_loop(self):
         while True:
