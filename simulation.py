@@ -142,12 +142,12 @@ class Simulation:
             if event.begin.to_float_hour() <= float_current_hour:
                 if event.end.to_float_hour() >= float_current_hour:
                     if float(event.temp) - self.temp_int >= 0.5:
-                        self.heat = True
+                        self.__heat = True
                     elif float(event.temp) - self.temp_int <= -0.5:
-                        self.clim = True
+                        self.__clim = True
                     else:
-                        self.clim = False
-                        self.heat = False
+                        self.__clim = False
+                        self.__heat = False
         self.send_to_influxdb()
 
     def send_to_influxdb(self):
