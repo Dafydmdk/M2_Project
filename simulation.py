@@ -138,16 +138,18 @@ class Simulation:
         hour = now.strftime('%H')
         minu = now.strftime('%M')
         float_current_hour = float(hour) + float(minu) / 60.0
+        temp = 16.0
         for event in event_list:
             if event.begin.to_float_hour() <= float_current_hour:
                 if event.end.to_float_hour() >= float_current_hour:
-                    if float(event.temp) - self.temp_int >= 0.5:
-                        self.__heat = True
-                    elif float(event.temp) - self.temp_int <= -0.5:
-                        self.__clim = True
-                    else:
-                        self.__clim = False
-                        self.__heat = False
+                    temp = float(event.temp)
+        if temp - self.temp_int >= 0.5:
+            self.__heat = True
+        elif temp - self.temp_int <= -0.5:
+            self.__clim = True
+        else:
+            self.__clim = False
+            self.__heat = False
         self.send_to_influxdb()
 
     def send_to_influxdb(self):
