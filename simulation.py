@@ -3,7 +3,6 @@ Simulation module, must be called as main.
 """
 
 import datetime
-import time
 import influx
 import bone
 import google
