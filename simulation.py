@@ -149,9 +149,9 @@ class Simulation:
         else:
             self.__clim = False
             self.__heat = False
-        self.send_to_influxdb()
+        self.send_to_influxdb(temp)
 
-    def send_to_influxdb(self):
+    def send_to_influxdb(self, consigne):
 
         """
         Send the inside temperature, the air conditioning state and the heating
@@ -170,6 +170,19 @@ class Simulation:
                 },
                 "fields": {
                     "value": self.temp_int
+                }
+            }
+        ]
+        influx.send_data(json_body)
+
+        json_body = [
+            {
+                "measurement": "temp_consigne",
+                "tags": {
+                    "binome": binome
+                },
+                "fields": {
+                    "value": consigne
                 }
             }
         ]
