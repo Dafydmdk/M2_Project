@@ -1,6 +1,7 @@
 import sys
 import logging
 import os
+import time
 
 
 class Ain:
@@ -13,7 +14,8 @@ class Ain:
         else:
             self.sys_path = '/sys/devices/'
             os.popen('echo cape-bone-iio > ' +
-                     self.sys_path + 'bone_capemgr.*/slots')
+                     self.sys_path + 'bone_capemgr.9/slots')
+            time.sleep(1)
             self.ocp = self.find_pattern(self.sys_path, 'ocp')
             self.helper = self.find_pattern(self.sys_path + self.ocp,
                                             'helper')

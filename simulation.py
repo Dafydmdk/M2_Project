@@ -205,14 +205,10 @@ class Simulation:
     def main_loop(self):
 
         """
-        Infinite simulation's loop, with a 60 seconds' sleep.
+        Run the program
         """
 
-        # If you want to cron this script instead of this infinite loop,
-        # just delete it, and call just self.run() in this function
-        while True:
-            self.run()
-            time.sleep(60)
+        self.run()
 
 
 if __name__ == '__main__':
