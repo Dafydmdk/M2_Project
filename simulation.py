@@ -201,14 +201,6 @@ class Simulation:
         ]
         influx.send_data(json_body)
 
-    def main_loop(self):
-
-        """
-        Run the program
-        """
-
-        self.run()
-
 
 if __name__ == '__main__':
-    Simulation().main_loop()
+    Simulation().run()
