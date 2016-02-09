@@ -122,7 +122,7 @@ class GoogleEvent:
         if event:
             self.__temp = event['summary']
             self.__begin = self.parse_time(event['start']['dateTime'])
-            self.__end = self.parse_time(event['end']['da              teTime'])  # WINDOWS BUG
+            self.__end = self.parse_time(event['end']['dateTime'])
         else:
             logging.warning('No event')
             self.__temp = '16'
