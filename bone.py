@@ -105,6 +105,7 @@ class Gpio:
                 f.write(self.gpio[4:])
         except IOError:
             logging.warning('GPIO already exported')
+        print('GPIO opened: ' + self.path)
 
     #def __del__(self):
 
