@@ -100,12 +100,12 @@ class Gpio:
         else:
             self.sys_path = '/sys/class/'
         self.path = self.sys_path + 'gpio/' + self.gpio + '/'
-        try:
-            with open(self.sys_path + 'gpio/export', 'w') as f:
-                f.write(self.gpio[4:])
-        except IOError:
-            logging.critical('Unable to open the gpio path')
-            sys.exit(1)
+       # try:
+        with open(self.sys_path + 'gpio/export', 'w') as f:
+            f.write(self.gpio[4:])
+        #except IOError:
+         #   logging.critical('Unable to open the gpio path')
+        #    sys.exit(1)
 
     #def __del__(self):
 
@@ -131,7 +131,7 @@ class Gpio:
 
         try:
             with open(self.path + 'direction', 'w') as f:
-                f.write('0')
+                f.write('in')
             with open(self.path + 'value') as f:
                 return f.read()
         except IOError:
@@ -147,7 +147,7 @@ class Gpio:
 
         try:
             with open(self.path + 'direction', 'w') as f:
-                f.write('1')
+                f.write('out')
             with open(self.path + 'value', 'w') as f:
                 f.write(value)
         except IOError:
