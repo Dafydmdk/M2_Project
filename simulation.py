@@ -27,7 +27,7 @@ class Simulation:
         something else than a BeagleBone
         """
 
-        self.led_r = bone.Led('gpio07', test)  # maybe wrong
+        self.led_r = bone.Led('gpio7', test)  # maybe wrong
         self.led_g = bone.Led('gpio50', test)
         self.led_b = bone.Led('gpio51', test)
         self.pot = bone.Ain('5', test)
