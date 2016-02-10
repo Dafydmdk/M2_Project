@@ -151,6 +151,7 @@ class Simulation:
         else:
             self.__clim = False
             self.__heat = False
+        self.on_state_changed()
         self.send_to_influxdb(temp)
 
     def send_to_influxdb(self, consigne):

@@ -177,7 +177,7 @@ class Led(Gpio):
         Put the led on.
         """
 
-        self.value = '1\n'
+        self.value = '1'
 
     def off(self):
 
@@ -185,4 +185,4 @@ class Led(Gpio):
         Put the led off.
         """
 
-        self.value = '0\n'
+        self.value = '0'
