@@ -145,9 +145,8 @@ class Gpio:
         """
 
         try:
-           # with open(self.path + 'direction', 'w') as f:
-            #    f.write('out')
-            os.popen("echo 1 > " + self.path + "value")
+            with open(self.path + 'direction', 'w') as f:
+                f.write('out')
             with open(self.path + 'value', 'w') as f:
                 f.write(value)
         except IOError:
@@ -178,7 +177,7 @@ class Led(Gpio):
         Put the led on.
         """
 
-        self.value = '1'
+        self.value = '1\n'
 
     def off(self):
 
@@ -186,4 +185,4 @@ class Led(Gpio):
         Put the led off.
         """
 
-        self.value = '0'
+        self.value = '0\n'
