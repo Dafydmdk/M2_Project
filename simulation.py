@@ -161,6 +161,7 @@ class Simulation:
         state to InfluxDB.
         Obviously, no unittest for this method, because otherwise it would
         pollute the ISEN's InfluxDB, and it would be a shame...
+        :param consigne: co
         """
 
         binome = "Dubrulle_Paillot"

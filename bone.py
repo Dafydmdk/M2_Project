@@ -107,20 +107,6 @@ class Gpio:
             logging.warning('GPIO already exported')
         print('GPIO opened: ' + self.path)
 
-    #def __del__(self):
-
-    #    """
-    #    Gpio's class destructor, which unexport the gpios for a clean quit.
-    #    """
-
-    #   if not self.test:
-    #        try:
-    #            with open(self.sys_path + 'gpio/unexport', 'w') as f:
-    #                f.write(self.gpio[4:])
-    #        except IOError:
-    #            logging.critical('Unable to open the gpio path')
-    #            sys.exit(1)
-
     @property
     def value(self):
 
