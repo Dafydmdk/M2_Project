@@ -65,7 +65,7 @@ class TestGpio(unittest.TestCase):
         self.assertEqual(value, '42')
         with open('./gpio/gpio60/direction') as f:
             value = f.read()
-            self.assertEqual(value, '0')
+            self.assertEqual(value, 'in')
         shutil.rmtree('./gpio', ignore_errors=True)
         print(' - OK')
 
@@ -80,7 +80,7 @@ class TestGpio(unittest.TestCase):
             self.assertEqual(value, '42')
         with open('./gpio/gpio60/direction') as f:
             value = f.read()
-            self.assertEqual(value, '1')
+            self.assertEqual(value, 'out')
         shutil.rmtree('./gpio', ignore_errors=True)
         print(' - OK')
 
