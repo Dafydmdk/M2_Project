@@ -30,7 +30,6 @@ class MyTime:
         if len(str_list) == 3:
             self.__hour = str_list[0]
             self.__min = str_list[1]
-            self.__sec = str_list[2]
         else:
             logging.error('Unable to create a MyTime')
             sys.exit(1)
@@ -74,26 +73,6 @@ class MyTime:
         """
 
         self.__min = min
-
-    @property
-    def sec(self):
-
-        """
-        Getter property for the __sec variable.
-        :return: __sec variable.
-        """
-
-        return self.__sec
-
-    @sec.setter
-    def sec(self, sec):
-
-        """
-        Setter property for the __sec variable
-        :param boolean: New __sec value
-        """
-
-        self.__sec = sec
 
     def to_float_hour(self):
 
