@@ -253,33 +253,6 @@ class GoogleAgendaApi:
 
         return events['items']
 
-    def send_events_to_influxdb(self, events):
-
-        """
-        Send the event information to InfluxDB.
-        :param events: The day events.
-        """
-
-        binome = "Dubrulle_Paillot"
-        for event in events:
-            now = datetime.date.today()
-            json_body = [
-                {
-                    "measurement": "consigne",
-                    "tags": {
-                        "binome": binome
-                    },
-                    "time": now.strftime('%Y-%m-%dT{h}:{m}.000000000Z'.format(
-                        h=event.begin.hour,
-                        m=event.begin.min
-                    )),
-                    "fields": {
-                        "value": event.temp
-                    }
-                }
-            ]
-            influx.send_data(json_body)
-
     def create_google_event_list(self):
 
         """
@@ -288,5 +261,4 @@ class GoogleAgendaApi:
         """
 
         events = list(GoogleEvent(el) for el in self.get_events())
-        self.send_events_to_influxdb(events)
         return events
